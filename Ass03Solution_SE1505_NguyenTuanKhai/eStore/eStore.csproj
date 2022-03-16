@@ -22,4 +22,9 @@
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\OrderDetail\" />
+    <Folder Include="Views\Product\" />
+  </ItemGroup>
+
 </Project>
