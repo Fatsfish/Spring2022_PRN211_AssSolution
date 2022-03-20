@@ -8,25 +8,25 @@ using System.Threading.Tasks;
 
 namespace eStore.Controllers
 {
-    public class OrderController : Controller
+    public class ProductController : Controller
     {
         private readonly FStoreDBAssignmentContext _context;
 
-        private OrderRepository OrderRepository = new OrderRepository();
+        private ProductRepository ProductRepository = new ProductRepository();
 
-        public OrderController(FStoreDBAssignmentContext context)
+        public ProductController(FStoreDBAssignmentContext context)
         {
             _context = context;
         }
 
-        // GET: Orders
+        // GET: Products
         public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
-            return View(OrderRepository.GetOrders());
+            return View(ProductRepository.GetProducts());
         }
 
-        // GET: Orders/Details/5
+        // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
@@ -36,16 +36,16 @@ namespace eStore.Controllers
                 return NotFound();
             }
 
-            var Order = OrderRepository.GetOrderByID((int)id);
-            if (Order == null)
+            var Product = ProductRepository.GetProductByID((int)id);
+            if (Product == null)
             {
                 return NotFound();
             }
 
-            return View(Order);
+            return View(Product);
         }
 
-        // GET: Orders/Create
+        // GET: Products/Create
         public IActionResult Create()
         {
             if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
@@ -53,24 +53,24 @@ namespace eStore.Controllers
             return View();
         }
 
-        // POST: Orders/Create
+        // POST: Products/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,MemberId,OrderDate,RequiredDate,ShippedDate,Freight")] Order Order)
+        public async Task<IActionResult> Create([Bind("ProductId,CategoryId,ProductName,Weight,UnitPrice,UnitslnStock")] Product Product)
         {
             if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
 
             if (ModelState.IsValid)
             {
-                OrderRepository.InsertOrder(Order);
+                ProductRepository.InsertProduct(Product);
                 return RedirectToAction(nameof(Index));
             }
-            return View(Order);
+            return View(Product);
         }
 
-        // GET: Orders/Edit/5
+        // GET: Products/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
@@ -80,24 +80,24 @@ namespace eStore.Controllers
                 return NotFound();
             }
 
-            var Order = OrderRepository.GetOrderByID((int)id);
-            if (Order == null)
+            var Product = ProductRepository.GetProductByID((int)id);
+            if (Product == null)
             {
                 return NotFound();
             }
-            return View(Order);
+            return View(Product);
         }
 
-        // POST: Orders/Edit/5
+        // POST: Products/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("OrderId,MemberId,OrderDate,RequiredDate,ShippedDate,Freight")] Order Order)
+        public async Task<IActionResult> Edit(int id, [Bind("ProductId,CategoryId,ProductName,Weight,UnitPrice,UnitslnStock")] Product Product)
         {
             if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
 
-            if (id != Order.OrderId)
+            if (id != Product.ProductId)
             {
                 return NotFound();
             }
@@ -106,11 +106,11 @@ namespace eStore.Controllers
             {
                 try
                 {
-                    OrderRepository.UpdateOrder(Order);
+                    ProductRepository.UpdateProduct(Product);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!OrderExists(Order.OrderId))
+                    if (!ProductExists(Product.ProductId))
                     {
                         return NotFound();
                     }
@@ -121,10 +121,10 @@ namespace eStore.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(Order);
+            return View(Product);
         }
 
-        // GET: Orders/Delete/5
+        // GET: Products/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
@@ -134,30 +134,30 @@ namespace eStore.Controllers
                 return NotFound();
             }
 
-            var Order = OrderRepository.GetOrderByID((int)id);
+            var Product = ProductRepository.GetProductByID((int)id);
 
-            if (Order == null)
+            if (Product == null)
             {
                 return NotFound();
             }
 
-            return View(Order);
+            return View(Product);
         }
 
-        // POST: Orders/Delete/5
+        // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
 
-            OrderRepository.DeleteOrder(id);
+            ProductRepository.DeleteProduct(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool OrderExists(int id)
+        private bool ProductExists(int id)
         {
-            return _context.Orders.Any(e => e.OrderId == id);
+            return _context.Products.Any(e => e.ProductId == id);
         }
     }
 }

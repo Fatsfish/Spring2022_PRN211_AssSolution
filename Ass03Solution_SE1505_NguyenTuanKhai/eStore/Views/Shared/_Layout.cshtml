@@ -24,6 +24,36 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Member" asp-action="Index">Users</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index">Orders</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="OderDetail" asp-action="Index">Details of Orders</a>
+                        </li>
+                        @if (@HttpContextAccessor.HttpContext.Session.GetString("name") == null && @HttpContextAccessor.HttpContext.Session.GetInt32("id") == null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href='/Home'>Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href='/Home/Create'>Register</a>
+                            </li>
+                        }
+                        @if (@HttpContextAccessor.HttpContext.Session.GetString("name") != null)
+                        {
+                            var t = @HttpContextAccessor.HttpContext.Session.GetString("name");
+                            <a class="nav-link text-dark" href'/appusers/Edit/@HttpContextAccessor.HttpContext.Session.GetInt32("id")'>Welcome @t</a>
+                            <a class="nav-link text-dark" href='../home/Logout'>Logout</a>
+                        }
+                        @if (@HttpContextAccessor.HttpContext.Session.GetString("name") == null && @HttpContextAccessor.HttpContext.Session.GetInt32("id") != null)
+                        {
+                            var t = @HttpContextAccessor.HttpContext.Session.GetInt32("id");
+                            <a class="nav-link text-dark" href'/appusers/Edit/@HttpContextAccessor.HttpContext.Session.GetInt32("id")'>Welcome user with id @t</a>
+                            <a class="nav-link text-dark" href='../home/Logout'>Logout</a>
+                        }
                     </ul>
                 </div>
             </div>

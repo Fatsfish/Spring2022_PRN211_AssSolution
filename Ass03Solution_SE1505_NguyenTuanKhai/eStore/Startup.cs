@@ -25,6 +25,10 @@ namespace eStore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
+            services.AddMvc().AddSessionStateTempDataProvider();
+            services.AddHttpContextAccessor();
+            services.AddDirectoryBrowser();
             services.AddControllersWithViews();
             services.AddDbContext<FStoreDBAssignmentContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("PostDB")));
@@ -46,7 +50,7 @@ namespace eStore
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseSession();
             app.UseRouting();
 
             app.UseAuthorization();

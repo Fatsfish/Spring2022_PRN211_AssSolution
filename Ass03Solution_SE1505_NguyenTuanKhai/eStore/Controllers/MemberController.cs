@@ -1,4 +1,6 @@
 ﻿using BusinessObject;
+using DataAccess.Repository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -10,6 +12,8 @@ namespace eStore.Controllers
     {
         private readonly FStoreDBAssignmentContext _context;
 
+        private MemberRepository memberRepository = new MemberRepository();
+
         public MemberController(FStoreDBAssignmentContext context)
         {
             _context = context;
@@ -18,19 +22,21 @@ namespace eStore.Controllers
         // GET: Members
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Members.ToListAsync());
+            if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
+            return View(memberRepository.GetMembers().ToList());
         }
 
         // GET: Members/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
+
             if (id == null)
             {
                 return NotFound();
             }
 
-            var Member = await _context.Members
-                .FirstOrDefaultAsync(m => m.MemberId == id);
+            var Member =  memberRepository.GetMemberByID((int)id);
             if (Member == null)
             {
                 return NotFound();
@@ -42,6 +48,8 @@ namespace eStore.Controllers
         // GET: Members/Create
         public IActionResult Create()
         {
+            if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
+
             return View();
         }
 
@@ -52,10 +60,11 @@ namespace eStore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MemberId,CompanyName,City,Country,Password,Email")] Member Member)
         {
+            if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
+
             if (ModelState.IsValid)
             {
-                _context.Add(Member);
-                await _context.SaveChangesAsync();
+                memberRepository.InsertMember(Member);
                 return RedirectToAction(nameof(Index));
             }
             return View(Member);
@@ -64,12 +73,14 @@ namespace eStore.Controllers
         // GET: Members/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
+
             if (id == null)
             {
                 return NotFound();
             }
 
-            var Member = await _context.Members.FindAsync(id);
+            var Member = memberRepository.GetMemberByID((int)id);
             if (Member == null)
             {
                 return NotFound();
@@ -84,6 +95,8 @@ namespace eStore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("MemberId,CompanyName,City,Country,Password,Email")] Member Member)
         {
+            if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
+
             if (id != Member.MemberId)
             {
                 return NotFound();
@@ -93,8 +106,7 @@ namespace eStore.Controllers
             {
                 try
                 {
-                    _context.Update(Member);
-                    await _context.SaveChangesAsync();
+                    memberRepository.UpdateMember(Member);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -115,13 +127,15 @@ namespace eStore.Controllers
         // GET: Members/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
+
             if (id == null)
             {
                 return NotFound();
             }
 
-            var Member = await _context.Members
-                .FirstOrDefaultAsync(m => m.MemberId == id);
+            var Member = memberRepository.GetMemberByID((int)id);
+
             if (Member == null)
             {
                 return NotFound();
@@ -135,9 +149,9 @@ namespace eStore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var Member = await _context.Members.FindAsync(id);
-            _context.Members.Remove(Member);
-            await _context.SaveChangesAsync();
+            if (HttpContext.Session.GetInt32("id") == null) { HttpContext.Session.SetString("error", "Please login first to access!"); return Redirect("/"); }
+
+            memberRepository.DeleteMember(id);
             return RedirectToAction(nameof(Index));
         }
 
